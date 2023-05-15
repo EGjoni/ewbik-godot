@@ -1,44 +1,52 @@
 #ifndef SKELETON_STATE_H
 #define SKELETON_STATE_H
 
-#include "core/ustring.h"
-#include "core/map.h"
-#include "core/vector.h"
-#include "core/reference.h"
-#include "core/math/transform.h"
+#include "core/string/ustring.h"
+#include "core/templates/vector.h"
+#include "core/templates/hash_map.h"
 #include "bone_state.h"
+#include "transform_state.h"
 #include "constraint_state.h"
 #include "target_state.h"
-#include "transform_state.h"
 
-class BoneState;
-class TransformState;
-class TargetState;
-class ConstraintState;
-
-class SkeletonState : public Reference {
-    GDCLASS(SkeletonState, Reference)
-
+class SkeletonState {
 public:
-    SkeletonState(bool p_assume_valid = false);
+    SkeletonState();
+    SkeletonState(bool assume_valid);
 
-    Ref<BoneState> add_bone(const String &p_id, const String &p_transform_id, const String &p_parent_id, const String &p_constraint_id, real_t p_stiffness, const String &p_target_id);
-    Ref<ConstraintState> add_constraint(const String &p_id, const String &p_for_bone_id, const String &p_swing_orientation_transform_id, const String &p_twist_orientation_transform_id, Ref<ConstraintState> p_direct_reference);
-    Ref<TargetState> add_target(const String &p_id, const String &p_transform_id, const String &p_for_bone_id, const Vector<double> &p_priorities, real_t p_depth_falloff, real_t p_weight);
-    void add_transform(const String &p_id, const Vector3 &p_translation, const Basis &p_rotation, const Vector3 &p_scale, const String &p_parent_id, const Variant &p_direct_reference);
+    BoneState *get_bone_state(int index);
+    int get_bone_count();
+    TransformState *get_transform_state(int index);
+    int get_transform_count();
+    ConstraintState *get_constraint_state(int index);
+    int get_constraint_count();
+    TargetState *get_target_state(int index);
+    int get_target_count();
 
-    // Other public methods.
+    void validate();
+    void prune();
+    BoneState *add_bone(String id, String transform_id, String parent_id, String constraint_id, double stiffness, String target_id);
+    ConstraintState *add_constraint(String id, String for_bone_id, String swing_orientation_transform_id, String twist_orientation_transform_id, Constraint *direct_reference);
+    TransformState *add_transform(String id, Transform *transform, String parent_id, bool invert);
+    TargetState *add_target(String id, String transform_id, String target_parent_id, Target *direct_reference);
+    void optimize();
 
 friend class BoneState;
 friend class ConstraintState;
 friend class TargetState;
 friend class TransformState;
 
-protected:
-    static void _bind_methods();
-
 private:
-    bool assumeValid;
+    bool assume_valid;
+    BoneState *root_bone_state = nullptr;
+    Vector<BoneState *> bones;
+    Vector<TransformState *> transforms;
+    Vector<ConstraintState *> constraints;
+    Vector<TargetState *> targets;
+    HashMap<String, BoneState *> bone_map;
+    HashMap<String, TransformState *> transform_map;
+    HashMap<String, ConstraintState *> constraint_map;
+    HashMap<String, TargetState *> target_map;
 };
 
 #endif // SKELETON_STATE_H

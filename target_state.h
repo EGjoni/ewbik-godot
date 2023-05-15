@@ -1,37 +1,42 @@
-#pragma once
-#include <string>
-#include <vector>
+#ifndef TARGET_STATE_H
+#define TARGET_STATE_H
 
+#include "core/string/ustring.h"
+#include "core/templates/vector.h"
+#include "skeleton_state.h"
+#include "transform_state.h"
 class SkeletonState;
-
 class TargetState {
 public:
-    TargetState(const std::string &id, const std::string &transform_id, const std::string &forBone_id, std::vector<double> priorities, double depthFalloff, double weight, SkeletonState &skeletonState);
+    TargetState(const String &p_id, const String &p_transform_id, const String &p_for_bone_id, Vector<float> p_priorities, float p_depth_falloff, float p_weight, SkeletonState &p_skeleton_state);
 
-    void setIndex(int index);
+    void set_index(int p_index);
     void optimize();
-    TransformState* getTransform();
+    TransformState* get_transform();
     void validate();
-    std::string getIdString();
-    uint8_t getModeCode();
-    double getDepthFalloff();
-    double getWeight();
-    int getIndex();
-    double getPriority(int basisDirection);
-    double getMaxPriority();
+    String get_id_string();
+    uint8_t get_mode_code();
+    float get_depth_falloff();
+    float get_weight();
+    int get_index();
+    float get_priority(int p_basis_direction);
+    float get_max_priority();
 
 private:
-    std::string id;
-    std::string transform_id;
-    std::string forBone_id;
-    uint8_t modeCode;
-    std::vector<double> priorities;
-    double depthFalloff;
-    double weight;
-    int index;
-    int transformIdx;
-    int forBoneIdx;
-    SkeletonState &skeletonState;
+    void init(const String &p_id, const String &p_transform_id, const String &p_for_bone_id, const Vector<float> &p_priorities, float p_depth_falloff, float p_weight);
 
-    void init(const std::string &id, const std::string &transform_id, const std::string &forBone_id, const std::vector<double> &priorities, double depthFalloff, double weight);
+    String id;
+    String for_bone_id;
+    String transform_id;
+    uint8_t mode_code;
+    Vector<float> priorities;
+    float depth_falloff;
+    float weight;
+    int index;
+
+    int for_bone_idx;
+    int transform_idx;
+    SkeletonState &skeleton_state;
 };
+
+#endif // TARGET_STATE_H

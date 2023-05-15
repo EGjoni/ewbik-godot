@@ -1,25 +1,23 @@
-// bonestate.h
 #pragma once
 
-#include <string>
-#include <unordered_map>
-#include <vector>
-#include "skeleton_state.h"
-#include "target_state.h"
-#include "constraint_state.h"
-#include "transform_State.h"
+#include "core/reference.h"
+#include "core/string.h"
+#include "core/vector.h"
+#include "core/dictionary.h"
 
-class SkeletonState; // Forward declaration of SkeletonState
+class TransformState;
+class TargetState;
+class ConstraintState;
+class SkeletonState;
 
 class BoneState {
 public:
-    BoneState(SkeletonState &skeletonState, std::string id, std::string transform_id, std::string parent_id, std::string target_id, std::string constraint_id, double stiffness);
-
+    BoneState(String id, String transform_id, String parent_id, String target_id, String constraint_id, real_t stiffness);
     TransformState getTransform();
     TargetState getTarget();
-    double getStiffness();
+    real_t getStiffness();
     BoneState getParent();
-    BoneState getChild(const std::string &id);
+    BoneState getChild(String id);
     BoneState getChild(int index);
     void clearChildList();
     int getChildCount();
@@ -27,26 +25,27 @@ public:
     ConstraintState getConstraint();
     void prune();
     void setIndex(int index);
-    void addChild(const std::string &id, int childIndex);
+    void addChild(String id, int childIndex);
     void optimize();
     void validate();
     int getIndex();
-    std::string getIdString();
-    void setStiffness(double stiffness);
+    String getIdString();
+    void setStiffness(real_t stiffness);
+    BoneState(SkeletonState &skeletonState, String id, String transform_id, String parent_id, String target_id, String constraint_id, real_t stiffness);
 
 private:
     SkeletonState &skeletonState;
-    std::string id;
-    std::string parent_id;
-    std::string transform_id;
-    std::string target_id;
-    std::string constraint_id;
-    double stiffness;
-    std::unordered_map<std::string, int> childMap;
-    int index;
+    String id;
+    String parent_id;
+    String transform_id;
+    String target_id;
+    String constraint_id;
+    real_t stiffness;
     int parentIdx;
-    std::vector<int> childIndices;
     int transformIdx;
     int constraintIdx;
     int targetIdx;
+    int index;
+    Dictionary childMap;
+    Vector<int> childIndices;
 };

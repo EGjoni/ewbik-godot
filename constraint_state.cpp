@@ -2,7 +2,7 @@
 #include "constraint_state.h"
 #include "transform_state.h"
 
-ConstraintState::ConstraintState(SkeletonState &skeletonState, std::string id, std::string forBone_id, std::string swingOrientationTransform_id, std::string twistOrientationTransform_id, Constraint directReference)
+ConstraintState::ConstraintState(SkeletonState &skeletonState, String id, String forBone_id, String swingOrientationTransform_id, String twistOrientationTransform_id, Constraint directReference)
     : skeletonState(skeletonState), id(id), forBone_id(forBone_id), swingOrientationTransform_id(swingOrientationTransform_id), twistOrientationTransform_id(twistOrientationTransform_id), directReference(directReference), index(0), swingTransform_idx(-1), twistTransform_idx(-1) {}
 
 void ConstraintState::prune() {
@@ -49,28 +49,32 @@ void ConstraintState::validate() {
 
     BoneState *forBone = skeletonState.boneMap[this->forBone_id];
     if (forBone == nullptr) {
-        throw std::runtime_error("Constraint '" + this->id + "' claims to constrain bone '" + forBone_id + "', but no such bone has been registered with this SkeletonState");
+        ERR_PRINT("Constraint '" + this->id + "' claims to constrain bone '" + forBone_id + "', but no such bone has been registered with this SkeletonState");
+        return;
     }
     if (this->swingOrientationTransform_id == "") {
-        throw std::runtime_error("Constraint with id '" + this->id + "' claims to have no swing transform, but this transform is required. "
+        ERR_PRINT("Constraint with id '" + this->id + "' claims to have no swing transform, but this transform is required. "
                                   "You may provide an identity transform if you wish to indicate that the constraint's swing space is equivalent to the parent bone's default space");
+        return;
     }
     TransformState *constraintSwing = skeletonState.transformMap[this->swingOrientationTransform_id];
     if (constraintSwing == nullptr) {
-        throw std::runtime_error("Constraint with id '" + this->id + "' claims to have a swingOrientationTransform with id'" + this->swingOrientationTransform_id + "', but no such transform has been registered with this SkeletonState'");
+        ERR_PRINT("Constraint with id '" + this->id + "' claims to have a swingOrientationTransform with id'" + this->swingOrientationTransform_id + "', but no such transform has been registered with this SkeletonState'");
+        return;
     }
     if (this->twistOrientationTransform_id != "") {
         TransformState *constraintTwist = skeletonState.transformMap[this->twistOrientationTransform_id];
         if (constraintTwist == nullptr) {
-            throw std::runtime_error("Constraint with id '" + this->id + "' claims to have a twist transform with id'" + this->twistOrientationTransform_id + "', but no such transform has been registered with this SkeletonState'");
+            ERR_PRINT("Constraint with id '" + this->id + "' claims to have a twist transform with id'" + this->twistOrientationTransform_id + "', but no such transform has been registered with this SkeletonState'");
+            return;
         }
     }
 }
 
-std::string ConstraintState::getIdString() {
+String ConstraintState::getIdString() {
     return this->id;
 }
 
 Constraint ConstraintState::getDirectReference() {
-    return this->directReference;
+return this->directReference;
 }

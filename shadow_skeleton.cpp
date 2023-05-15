@@ -1,7 +1,7 @@
 #include "shadow_skeleton.h"
 
-ShadowSkeleton::ShadowSkeleton(SkeletonState& skelState, AbstractArmature& forArmature)
-    : forArmature(&forArmature), skelState(&skelState) {
+ShadowSkeleton::ShadowSkeleton(SkeletonState& skelState, real_t dampening) {
+    this->base_dampening = dampening; 
     buildSimTransformsHierarchy();
     buildArmatureSegmentHierarchy();
     buildTraversalArray();
@@ -23,7 +23,7 @@ void ShadowSkeleton::solve(double dampening, int iterations, int stabilizationPa
             traversalArray[j]->pullBackTowardAllowableRegion(i, iterations);
         }
         for (int j = 0; j <= endOnIndex; j++) {
-            traversalArray[j]->fastUpdateOptimalRotationToPinnedDescendants(dampening,
+            traversalArray[j]->fastUpdateOptimalRotationToPinnedDescendants(stabilizationPasses,
                 j == endOnIndex && endOnIndex == traversalArray.size() - 1);
         }
     }
@@ -70,11 +70,7 @@ void ShadowSkeleton::buildSimTransformsHierarchy() {
     if (transformCount == 0) return;
 
     this->simTransforms.resize(transformCount);
-    this->shadowSpace = forArmature->localAxes()->clone(); // Assuming clone() is implemented in IKNode3D
-
-    // Detach from parent and set to identity
-    this->shadowSpace->set_parent(Ref<IKNode3D>());
-    this->shadowSpace->set_transform(Transform3D());
+    this->shadowSpace = //IFire, make an Identity IKNode3d here. 
 
     for (int i = 0; i < transformCount; i++) {
         TransformState* ts = skelState->getTransformState(i);
@@ -117,6 +113,11 @@ void ShadowSkeleton::buildTraversalArray() {
         traversalArray[j] = reversedTraversalArray[i];
         j++;
     }
+}
+
+void setDampening(real_t dampening) {
+    this->base_dampening = dampening; 
+    this->updateRates();
 }
 
 void ShadowSkeleton::updateRates() {
